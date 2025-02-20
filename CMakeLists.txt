@@ -1,8 +1,25 @@
 cmake_minimum_required(VERSION 3.15)
 project(snake)
 
-add_executable(snake
+add_executable(
+    snake
     src/main.cpp
+    src/game.cpp
+    src/entity.cpp
 )
 
 target_include_directories(snake PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    RedGir
+    GIT_REPOSITORY https://github.com/itljan30/RedGir.git
+    GIT_TAG        v0.1.0
+)
+
+FetchContent_MakeAvailable(RedGir)
+
+add_dependencies(snake RedGir_cpp)
+
+target_link_libraries(snake PRIVATE RedGir_cpp)

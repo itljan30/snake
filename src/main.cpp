@@ -1,5 +1,8 @@
-#include <iostream>
+#include "game.h"
+
+#include <RedGir/engine.h>
 
 int main() {
-    std::cout << "Hello\n";
+    Game game = Game();
+    game.run();
 }
