@@ -1,6 +1,7 @@
 #pragma once
 
-#include "entity.h"
+#include "snake.h"
+#include "apple.h"
 
 #include <RedGir/engine.h>
 #include <RedGir/timer.h>
@@ -10,6 +11,7 @@
 class Game {
 public:
     Game();
+    ~Game();
 
     void run();
 
@@ -17,6 +19,7 @@ private:
     void update();
 
 private:
-    std::vector<Entity> m_entities;
+    std::vector<Snake> m_snakeParts;
+    Apple m_apple;
     Engine m_engine;
 };

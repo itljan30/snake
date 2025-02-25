@@ -5,7 +5,8 @@ add_executable(
     snake
     src/main.cpp
     src/game.cpp
-    src/entity.cpp
+    src/snake.cpp
+    src/apple.cpp
 )
 
 target_include_directories(snake PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)

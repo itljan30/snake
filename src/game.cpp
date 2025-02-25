@@ -1,5 +1,6 @@
 #include "game.h"
-#include "entity.h"
+#include "snake.h"
+#include "apple.h"
 
 #include <RedGir/engine.h>
 
@@ -7,7 +8,7 @@ Engine initializeEngine() {
     return Engine::create()
         .setWindowName("Snake")
         .setWindowSize(800, 600)
-        .setClearColor(Color(0, 0, 0, 255))
+        .setClearColor(Color(32, 32, 32, 255))
         .pollKeyboard()
         .notResizable()
         .init();
@@ -15,9 +16,34 @@ Engine initializeEngine() {
 
 Game::Game() : m_engine(initializeEngine()) {}
 
+Game::~Game() {}
+
 void Game::update() {
-    for (Entity entity : m_entities) {
-        entity.update();
+    // I feel like there's probably a way better way to share this information, but I have no idea.
+    GameContext context {
+        .snakeParts = m_snakeParts,
+        .engine = m_engine,
+        .apple = m_apple,
+    };
+
+    std::vector<GameEvent> events;
+
+    for (Snake &snakePart : m_snakeParts) {
+        events.push_back(snakePart.update(context));
+    }
+
+    for (GameEvent event : events) {
+        switch (event) {
+            case None: break;
+            case AppleConsumed: {
+                // delete current apple and create a new one in an unoccupied space
+                break;
+            }
+            case GameOver: {
+                // show game over message
+                break;
+            }
+        }
     }
 }
 
