@@ -14,7 +14,7 @@ struct Coords {
 };
 
 struct GameContext {
-    const std::vector<Snake> &snakeParts;
+    std::vector<Snake> &snakeParts;
     Engine &engine;
     const Apple &apple;
 };

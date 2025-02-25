@@ -9,7 +9,7 @@ Engine initializeEngine() {
     Engine engine = Engine::create()
         .setWindowName("Snake")
         .setWindowSize(g_screenWidth, g_screenHeight)
-        .setClearColor(Color(32, 32, 32, 255))
+        .setClearColor(Color(16, 16, 16, 255))
         .pollKeyboard()
         .notResizable()
         .init();
@@ -19,7 +19,7 @@ Engine initializeEngine() {
     return engine;
 }
 
-Game::Game() : m_engine(initializeEngine()), m_state(GameState::MainMenu), m_snakeSpeed(1) {
+Game::Game() : m_engine(initializeEngine()), m_state(GameState::Playing), m_snakeSpeed(3) {
     m_lastSnakeUpdate = m_engine.timeSinceInitializationSeconds();
 }
 
@@ -31,11 +31,13 @@ void Game::updatePlaying() {
         return;
     }
 
+
     // Cap snake speed so it doesn't move 60 times per second.
-    float dt = m_engine.timeSinceInitializationSeconds() - m_lastSnakeUpdate;
-    if (dt < (m_snakeSpeed * 60.0 / 4.0)) {
+    float dt =  m_engine.timeSinceInitializationSeconds() - m_lastSnakeUpdate;
+    if (dt < 0.25 / m_snakeSpeed) {
         return;
     }
+
 
     GameContext context = generateGameContext();
 
@@ -113,6 +115,10 @@ GameContext Game::generateGameContext() {
     };
 }
 
+void Game::updateGameOver() {
+
+}
+
 void Game::update() {
     // IDEA This feels like it could become cumbersome with more states, is there a better way to do this?
     // ooh maybe a hashmap with key being state and value being callback?
@@ -134,19 +140,26 @@ void Game::update() {
             break;
         }
         case GameState::GameOver: {
+            updateGameOver();
             // TODO do something
             break;
         }
     }
 }
 
+void Game::addNewSnake() {
+    GameContext context = generateGameContext();
+    Snake::addNewSnakeToSnakeParts(context);
+}
+
 void Game::run() {
     // TODO set up crt and scanlines shader
     // TODO set up main menu scene
 
+    addNewSnake();
+
     while (m_engine.isRunning()) {
         update();
-
         m_engine.drawFrame();
     }
 }

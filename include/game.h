@@ -34,6 +34,9 @@ private:
     void updatePaused();
     void updateMainMenu();
     void updatePlaying();
+    void updateGameOver();
+
+    void addNewSnake();
 
     GameContext generateGameContext();
 
