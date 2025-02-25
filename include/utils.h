@@ -19,7 +19,7 @@ struct GameContext {
     const Apple &apple;
 };
 
-enum GameEvent {
+enum class GameEvent {
     None,
     AppleConsumed,
     GameOver,

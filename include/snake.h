@@ -2,7 +2,7 @@
 
 #include "utils.h"
 
-enum Direction {
+enum class Direction {
     Up,
     Left,
     Right,

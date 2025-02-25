@@ -34,19 +34,19 @@ void Snake::updatePosition(GameContext &context) {
     Sprite sprite = context.engine.getSprite(m_id);
     auto [xPos, yPos] = sprite.getPosition();
     switch (m_direction) {
-        case Up: {
+        case Direction::Up: {
             sprite.setPosition(xPos, yPos + g_tileHeight);
             break;
         }
-        case Left: {
+        case Direction::Left: {
             sprite.setPosition(xPos - g_tileWidth , yPos);
             break;
         }
-        case Right: {
+        case Direction::Right: {
             sprite.setPosition(xPos + g_tileWidth, yPos);
             break;
         }
-        case Down: {
+        case Direction::Down: {
             sprite.setPosition(xPos, yPos - g_tileHeight);
             break;
         }

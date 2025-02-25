@@ -7,3 +7,5 @@ constexpr uint32_t g_screenHeight = 600;
 
 constexpr uint32_t g_tileWidth = 40;
 constexpr uint32_t g_tileHeight = 30;
+
+constexpr float g_targetFps = 60.0;
