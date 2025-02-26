@@ -22,7 +22,11 @@ Engine initializeEngine() {
 }
 
 Game::Game()
-    : m_engine(initializeEngine()), m_state(GameState::Playing), m_snakeSpeed(3), m_apple(Apple::dummyApple()) {
+    : m_engine(initializeEngine()), m_state(GameState::Playing), m_snakeSpeed(2), m_apple(Apple::dummyApple()) {
+    // HACK This is to prevent Snake objects from moving in memory 
+    // since a Snake object holds a pointer to the Snake in front of it.
+    m_snakeParts.reserve(g_tilesPerRow * g_tilesPerCol);
+
     m_lastSnakeUpdate = m_engine.timeSinceInitializationSeconds();
 }
 

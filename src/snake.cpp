@@ -32,7 +32,8 @@ void Snake::addNewSnakeToSnakeParts(GameContext &context) {
                 yPos
             },
             nullptr,
-            Direction::None
+            Direction::None,
+            true
         );
     }
     else {
@@ -54,13 +55,14 @@ void Snake::addNewSnakeToSnakeParts(GameContext &context) {
                 lastPart.m_coords.y
             },
             &lastPart,
-            lastPart.m_direction
+            lastPart.m_direction,
+            false
         );
     }
 } 
 
-Snake::Snake(SpriteId id, Coords coords, Snake *head, Direction direction)
-    : m_id(id), m_head(head), m_coords(coords), m_direction(direction) {}
+Snake::Snake(SpriteId id, Coords coords, Snake *head, Direction direction, bool hasMoved)
+    : m_id(id), m_head(head), m_coords(coords), m_direction(direction), m_hasMoved(hasMoved) {}
 
 Snake::~Snake() {}
 
@@ -104,6 +106,11 @@ Coords Snake::getCoords() {
 }
 
 GameEvent Snake::updatePosition(GameContext &context) {
+    if (!m_hasMoved) {
+        m_hasMoved = true;
+        return GameEvent::None;
+    }
+
     Sprite sprite = context.engine.getSprite(m_id);
     auto [xPos, yPos] = m_coords;
     switch (m_direction) {

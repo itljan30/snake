@@ -16,7 +16,7 @@ class Snake {
 public:
     // TODO Add error handling for failing to create sprites.
     static void addNewSnakeToSnakeParts(GameContext &context);
-    Snake(SpriteId id, Coords coords, Snake *head, Direction direction);
+    Snake(SpriteId id, Coords coords, Snake *head, Direction direction, bool hasMoved);
     ~Snake();
 
     Coords getCoords();
@@ -28,7 +28,6 @@ public:
     }
 
 private:
-
     void updateDirection(GameContext &context);
     GameEvent updatePosition(GameContext &context);
     GameEvent resolveCollisions(GameContext &context);
@@ -40,4 +39,5 @@ private:
     Coords m_coords;
     Direction m_direction;
     SpriteId m_id;
+    bool m_hasMoved;
 };
