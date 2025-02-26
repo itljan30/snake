@@ -14,17 +14,23 @@ enum class Direction {
 
 class Snake {
 public:
+    // TODO Add error handling for failing to create sprites.
     static void addNewSnakeToSnakeParts(GameContext &context);
-    Snake(SpriteId id, bool moved, Coords coords, Snake *head, Direction direction);
+    Snake(SpriteId id, Coords coords, Snake *head, Direction direction);
     ~Snake();
 
+    Coords getCoords();
     void addSnake(GameContext &context);
     GameEvent update(GameContext &context);
+
+    bool operator==(const Snake &other) const {
+        return (m_id == other.m_id);
+    }
 
 private:
 
     void updateDirection(GameContext &context);
-    void updatePosition(GameContext &context);
+    GameEvent updatePosition(GameContext &context);
     GameEvent resolveCollisions(GameContext &context);
 
 private:
@@ -34,5 +40,4 @@ private:
     Coords m_coords;
     Direction m_direction;
     SpriteId m_id;
-    bool m_hasMoved;
 };

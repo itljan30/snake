@@ -29,12 +29,16 @@ public:
     void run();
 
 private:
+    void loadGameScene();
+
     void update();
     void updateOptions();
     void updatePaused();
     void updateMainMenu();
     void updatePlaying();
     void updateGameOver();
+
+    std::vector<GameEvent> updateSnake();
 
     void addNewSnake();
 

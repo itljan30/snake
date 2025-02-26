@@ -5,6 +5,8 @@
 
 #include <RedGir/engine.h>
 
+#include <cstdint>
+
 Engine initializeEngine() {
     Engine engine = Engine::create()
         .setWindowName("Snake")
@@ -19,18 +21,32 @@ Engine initializeEngine() {
     return engine;
 }
 
-Game::Game() : m_engine(initializeEngine()), m_state(GameState::Playing), m_snakeSpeed(3) {
+Game::Game()
+    : m_engine(initializeEngine()), m_state(GameState::Playing), m_snakeSpeed(3), m_apple(Apple::dummyApple()) {
     m_lastSnakeUpdate = m_engine.timeSinceInitializationSeconds();
+}
+
+std::vector<GameEvent> Game::updateSnake() {
+    GameContext context = generateGameContext();
+
+    std::vector<GameEvent> events;
+
+    // Iterate backwards to simplify position updates.
+    for (int32_t i = m_snakeParts.size() - 1; i >= 0; i--) {
+        Snake &snakePart = m_snakeParts.at(i);
+        events.push_back(snakePart.update(context));
+    }
+
+    return std::move(events);
 }
 
 Game::~Game() {}
 
 void Game::updatePlaying() {
     if (m_engine.getKeyState(Key::Escape) == Action::Pressed) {
-        // TODO change state over to paused menu
+        m_state = GameState::Pause;
         return;
     }
-
 
     // Cap snake speed so it doesn't move 60 times per second.
     float dt =  m_engine.timeSinceInitializationSeconds() - m_lastSnakeUpdate;
@@ -38,30 +54,33 @@ void Game::updatePlaying() {
         return;
     }
 
-
-    GameContext context = generateGameContext();
-
-    std::vector<GameEvent> events;
-
-    for (Snake &snakePart : m_snakeParts) {
-        events.push_back(snakePart.update(context));
-    }
+    // I don't really like this GameEvent system not gonna lie, it feels like a very ductape solution.
+    std::vector<GameEvent> events = updateSnake();
 
     for (GameEvent event : events) {
         switch (event) {
-            case GameEvent::None: break;
+            case GameEvent::None: {
+                break;
+            }
             case GameEvent::AppleConsumed: {
-                // TODO delete current apple and create a new one in an unoccupied space
+                GameContext context = generateGameContext();
+                m_apple.removeFromEngine(context);
+                
+                m_apple = Apple::createNewApple(context);
 
                 if (m_applesConsumed == 4) {
                     m_snakeSpeed += 1;
                 }
+
+                Snake::addNewSnakeToSnakeParts(context);
+
                 m_applesConsumed = (m_applesConsumed + 1) % 5;
                 break;
             }
             case GameEvent::GameOver: {
+                m_state = GameState::GameOver;
+                return;
                 // TODO load game over screen and set game state to game over
-                break;
             }
         }
     }
@@ -116,12 +135,11 @@ GameContext Game::generateGameContext() {
 }
 
 void Game::updateGameOver() {
-
 }
 
 void Game::update() {
     // IDEA This feels like it could become cumbersome with more states, is there a better way to do this?
-    // ooh maybe a hashmap with key being state and value being callback?
+    // ooh maybe a hashmap with key being state and value being callback function?
     switch (m_state) {
         case GameState::MainMenu: {
             updateMainMenu();
@@ -147,16 +165,20 @@ void Game::update() {
     }
 }
 
-void Game::addNewSnake() {
+void Game::loadGameScene() {
     GameContext context = generateGameContext();
+    m_apple = Apple::createNewApple(context);
     Snake::addNewSnakeToSnakeParts(context);
+}
+
+void Game::addNewSnake() {
 }
 
 void Game::run() {
     // TODO set up crt and scanlines shader
     // TODO set up main menu scene
 
-    addNewSnake();
+    loadGameScene();
 
     while (m_engine.isRunning()) {
         update();

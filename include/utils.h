@@ -11,12 +11,16 @@ class Apple;
 struct Coords {
     int32_t x;
     int32_t y;
+
+    bool operator==(const Coords &other) const {
+        return (x == other.x && y == other.y);
+    }
 };
 
 struct GameContext {
     std::vector<Snake> &snakeParts;
     Engine &engine;
-    const Apple &apple;
+    Apple &apple;
 };
 
 enum class GameEvent {

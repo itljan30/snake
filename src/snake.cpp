@@ -1,4 +1,5 @@
 #include "snake.h"
+#include "apple.h"
 #include "utils.h"
 #include "constants.h"
 
@@ -26,7 +27,6 @@ void Snake::addNewSnakeToSnakeParts(GameContext &context) {
 
         context.snakeParts.emplace_back(
             snakeId,
-            true,
             Coords {
                 xPos,
                 yPos
@@ -49,7 +49,6 @@ void Snake::addNewSnakeToSnakeParts(GameContext &context) {
 
         context.snakeParts.emplace_back(
             newPartId,
-            false,
             Coords {
                 lastPart.m_coords.x,
                 lastPart.m_coords.y
@@ -60,8 +59,8 @@ void Snake::addNewSnakeToSnakeParts(GameContext &context) {
     }
 } 
 
-Snake::Snake(SpriteId id, bool hasMoved, Coords coords, Snake *head, Direction direction)
-    : m_head(head), m_hasMoved(hasMoved), m_coords(coords), m_direction(direction) {}
+Snake::Snake(SpriteId id, Coords coords, Snake *head, Direction direction)
+    : m_id(id), m_head(head), m_coords(coords), m_direction(direction) {}
 
 Snake::~Snake() {}
 
@@ -100,12 +99,11 @@ void Snake::updateDirection(GameContext &context) {
     }
 }
 
-void Snake::updatePosition(GameContext &context) {
-    if (!m_hasMoved) {
-        m_hasMoved = true;
-        return;
-    }
+Coords Snake::getCoords() {
+    return m_coords;
+}
 
+GameEvent Snake::updatePosition(GameContext &context) {
     Sprite sprite = context.engine.getSprite(m_id);
     auto [xPos, yPos] = m_coords;
     switch (m_direction) {
@@ -128,15 +126,44 @@ void Snake::updatePosition(GameContext &context) {
         }
     }
 
+    if (m_coords.x < 0 || m_coords.x > g_screenWidth / g_tileSize - 1 || 
+        m_coords.y < 0 || m_coords.y > g_screenHeight / g_tileSize - 1) {
+        return GameEvent::GameOver;
+    }
+
     sprite.setPosition(m_coords.x * g_tileSize, m_coords.y * g_tileSize);
+    return GameEvent::None;
 }
 
 GameEvent Snake::resolveCollisions(GameContext &context) {
+    // Only checking collisions for the head of the snake.
+    if (m_head != nullptr) {
+        return GameEvent::None;
+    }
+
+    Coords appleCoords = context.apple.getCoords();
+    if (m_coords == appleCoords) {
+        return GameEvent::AppleConsumed;
+    }
+
+    for (Snake &other : context.snakeParts) {
+        if (*this == other) {
+            continue;
+        }
+        
+        if (m_coords == other.m_coords) {
+            return GameEvent::GameOver;
+        }
+    }
+
     return GameEvent::None;
 }
 
 GameEvent Snake::update(GameContext &context) {
     updateDirection(context);
-    updatePosition(context);
+    GameEvent res = updatePosition(context);
+    if (res != GameEvent::None) {
+        return res;
+    }
     return resolveCollisions(context);
 }
