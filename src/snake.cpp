@@ -10,6 +10,10 @@
 const Color snakeColor = Color(0, 64, 255, 255);
 constexpr uint32_t snakeLayer = 5;
 
+void Snake::removeFromEngine(GameContext &context) {
+    context.engine.removeSprite(m_id);
+}
+
 void Snake::addNewSnakeToSnakeParts(GameContext &context) {
     if (context.snakeParts.size() == 0) {
         int32_t xPos = g_tilesPerRow / 2;

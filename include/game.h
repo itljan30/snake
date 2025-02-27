@@ -31,6 +31,15 @@ public:
 private:
     void loadGameScene();
 
+    void loadOptions();
+    void removeOptions();
+    void loadMainMenu();
+    void removeMainMenu();
+    void loadPauseMenu();
+    void removePauseMenu();
+    void loadGameOver();
+    void removeGameOver();
+
     void update();
     void updateOptions();
     void updatePaused();
@@ -38,11 +47,13 @@ private:
     void updatePlaying();
     void updateGameOver();
 
+    void clearScene();
     std::vector<GameEvent> updateSnake();
-
-    void addNewSnake();
-
     GameContext generateGameContext();
+
+    void resetGameData();
+
+    void loadSpriteSheets();
 
 private:
     std::vector<Snake> m_snakeParts;
@@ -52,4 +63,11 @@ private:
     float m_lastSnakeUpdate;
     float m_snakeSpeed;
     uint32_t m_applesConsumed;
+    GameState m_stateBeforeOptions;
+    SpriteSheetId m_mainMenuId;
+    SpriteId m_mainMenu;
+    SpriteSheetId m_pauseMenuId;
+    SpriteId m_pausedMenu;
+    SpriteSheetId m_gameOverId;
+    SpriteId m_gameOver;
 };

@@ -7,6 +7,9 @@
 
 #include <cstdint>
 
+static const SpriteId dummyId = SpriteId { INT32_MAX };
+static const int32_t startingSpeed = 3;
+
 Engine initializeEngine() {
     Engine engine = Engine::create()
         .setWindowName("Snake")
@@ -21,16 +24,23 @@ Engine initializeEngine() {
     return engine;
 }
 
+void Game::resetGameData() {
+    m_snakeParts.clear();
+    m_snakeSpeed = startingSpeed;
+}
+
 Game::Game()
-    : m_engine(initializeEngine()), m_state(GameState::Playing), m_snakeSpeed(2), m_apple(Apple::dummyApple()) {
-    // HACK This is to prevent Snake objects from moving in memory 
+    : m_engine(initializeEngine()), m_state(GameState::MainMenu),
+      m_apple(Apple::dummyApple()), m_stateBeforeOptions(GameState::MainMenu),
+      m_mainMenu(dummyId), m_pausedMenu(dummyId), m_gameOver(dummyId) {
+    // HACK Reserve is to prevent Snake objects from moving in memory 
     // since a Snake object holds a pointer to the Snake in front of it.
     m_snakeParts.reserve(g_tilesPerRow * g_tilesPerCol);
-
     m_lastSnakeUpdate = m_engine.timeSinceInitializationSeconds();
 }
 
 std::vector<GameEvent> Game::updateSnake() {
+    // I don't really like this GameEvent system not gonna lie, it feels like a very hacky solution.
     GameContext context = generateGameContext();
 
     std::vector<GameEvent> events;
@@ -48,6 +58,7 @@ Game::~Game() {}
 
 void Game::updatePlaying() {
     if (m_engine.getKeyState(Key::Escape) == Action::Pressed) {
+        loadPauseMenu();
         m_state = GameState::Pause;
         return;
     }
@@ -58,7 +69,6 @@ void Game::updatePlaying() {
         return;
     }
 
-    // I don't really like this GameEvent system not gonna lie, it feels like a very ductape solution.
     std::vector<GameEvent> events = updateSnake();
 
     for (GameEvent event : events) {
@@ -72,19 +82,19 @@ void Game::updatePlaying() {
                 
                 m_apple = Apple::createNewApple(context);
 
-                if (m_applesConsumed == 4) {
+                if (m_applesConsumed == 19) {
                     m_snakeSpeed += 1;
                 }
 
                 Snake::addNewSnakeToSnakeParts(context);
 
-                m_applesConsumed = (m_applesConsumed + 1) % 5;
+                m_applesConsumed = (m_applesConsumed + 1) % 20;
                 break;
             }
             case GameEvent::GameOver: {
+                loadGameOver();
                 m_state = GameState::GameOver;
                 return;
-                // TODO load game over screen and set game state to game over
             }
         }
     }
@@ -94,15 +104,19 @@ void Game::updatePlaying() {
 
 void Game::updatePaused() {
     if (m_engine.getKeyState(Key::X) == Action::Pressed) {
-        // TODO clear game assets and load main menu
+        clearScene();
+        loadMainMenu();
+        m_state = GameState::MainMenu;
     }
     else if (m_engine.getKeyState(Key::O) == Action::Pressed) {
-        // TODO load options menu
-        // don't clear game assets so game is in background
+        m_stateBeforeOptions = GameState::Pause;
+        removePauseMenu();
+        loadOptions();
+        m_state = GameState::Options;
     }
     else if (m_engine.getKeyState(Key::Escape) == Action::Pressed) {
-        // TODO remove assets for pause menu 
-        // enter playing state
+        removePauseMenu();
+        m_state = GameState::Playing;
     }
 }
 
@@ -111,18 +125,38 @@ void Game::updateMainMenu() {
         m_engine.stop();
     }
     else if (m_engine.getKeyState(Key::O) == Action::Pressed) {
-        // TODO load options menu
-        // I think I specifically don't clear the main menu stuff so that options display above the main menu
+        m_stateBeforeOptions = GameState::MainMenu;
+        removeMainMenu();
+        loadOptions();
+        m_state = GameState::Options;
     }
     else if (m_engine.getKeyState(Key::Enter) == Action::Pressed) {
-        // TODO load main game
-        // delete main menu assets
+        removeMainMenu();
+        resetGameData();
+        loadGameScene();
+        m_state = GameState::Playing;
     }
 }
 
 void Game::updateOptions() {
     if (m_engine.getKeyState(Key::Escape) == Action::Pressed) {
-        // TODO return to previous game state.
+        removeOptions();
+        m_state = m_stateBeforeOptions;
+        switch (m_stateBeforeOptions) {
+            case GameState::MainMenu: {
+                loadMainMenu();
+                break;
+            }
+            case GameState::Pause: {
+                loadPauseMenu();
+                break;
+            }
+
+            // These should be impossible
+            case GameState::Options: break;
+            case GameState::Playing: break;
+            case GameState::GameOver: break;
+        }
         return;
     }
     // TODO probably have some number keys to adjust screen resolution or something
@@ -139,6 +173,12 @@ GameContext Game::generateGameContext() {
 }
 
 void Game::updateGameOver() {
+    if (m_engine.getKeyState(Key::Enter) == Action::Pressed) {
+        removeGameOver();
+        clearScene();
+        loadGameScene();
+        m_state = GameState::Playing;
+    }
 }
 
 void Game::update() {
@@ -163,10 +203,20 @@ void Game::update() {
         }
         case GameState::GameOver: {
             updateGameOver();
-            // TODO do something
             break;
         }
     }
+}
+
+void Game::clearScene() {
+    GameContext context = generateGameContext();
+
+    m_apple.removeFromEngine(context);
+    for (Snake &snake : m_snakeParts) {
+        snake.removeFromEngine(context);
+    }
+
+    resetGameData();
 }
 
 void Game::loadGameScene() {
@@ -175,14 +225,51 @@ void Game::loadGameScene() {
     Snake::addNewSnakeToSnakeParts(context);
 }
 
-void Game::addNewSnake() {
+void Game::removeOptions() {
+
+}
+
+void Game::loadOptions() {
+
+}
+
+void Game::removeGameOver() {
+    m_engine.removeSprite(m_gameOver);
+}
+
+void Game::loadGameOver() {
+    m_engine.addSprite(m_gameOverId, 0, 0, 0, 1, 800, 600, m_engine.defaultShader());
+}
+
+void Game::removePauseMenu() {
+    m_engine.removeSprite(m_pausedMenu);
+}
+
+void Game::loadPauseMenu() {
+    m_engine.addSprite(m_pauseMenuId, 0, 0, 0, 10, 800, 600, m_engine.defaultShader());
+}
+
+void Game::removeMainMenu() {
+    m_engine.removeSprite(m_mainMenu);
+}
+
+void Game::loadMainMenu() {
+    m_engine.addSprite(m_mainMenuId, 0, 0, 0, 1, 800, 600, m_engine.defaultShader());
+}
+
+void Game::loadSpriteSheets() {
+    m_mainMenuId = m_engine.addSpriteSheet("assets/main-menu.png", 800, 600);
+    m_pauseMenuId = m_engine.addSpriteSheet("assets/paused.png", 800, 600);
+    m_gameOverId = m_engine.addSpriteSheet("assets/game-over.png", 800, 600);
 }
 
 void Game::run() {
     // TODO set up crt and scanlines shader
     // TODO set up main menu scene
+    
+    loadSpriteSheets();
 
-    loadGameScene();
+    loadMainMenu();
 
     while (m_engine.isRunning()) {
         update();

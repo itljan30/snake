@@ -22,6 +22,7 @@ public:
     Coords getCoords();
     void addSnake(GameContext &context);
     GameEvent update(GameContext &context);
+    void removeFromEngine(GameContext &context);
 
     bool operator==(const Snake &other) const {
         return (m_id == other.m_id);
