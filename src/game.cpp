@@ -7,7 +7,8 @@
 
 #include <cstdint>
 
-static const SpriteId dummyId = SpriteId { INT32_MAX };
+static const SpriteId dummySprite = SpriteId { INT32_MAX };
+static const SpriteSheetId dummySpriteSheet = SpriteSheetId { INT32_MAX };
 static const int32_t startingSpeed = 3;
 
 Engine initializeEngine() {
@@ -32,7 +33,10 @@ void Game::resetGameData() {
 Game::Game()
     : m_engine(initializeEngine()), m_state(GameState::MainMenu),
       m_apple(Apple::dummyApple()), m_stateBeforeOptions(GameState::MainMenu),
-      m_mainMenu(dummyId), m_pausedMenu(dummyId), m_gameOver(dummyId) {
+      m_mainMenu(dummySprite), m_pauseMenu(dummySprite), m_gameOver(dummySprite),
+      m_options(dummySprite), m_mainMenuId(dummySpriteSheet), m_pauseMenuId(dummySpriteSheet),
+      m_gameOverId(dummySpriteSheet), m_optionsId(dummySpriteSheet) 
+    {
     // HACK Reserve is to prevent Snake objects from moving in memory 
     // since a Snake object holds a pointer to the Snake in front of it.
     m_snakeParts.reserve(g_tilesPerRow * g_tilesPerCol);
@@ -226,11 +230,11 @@ void Game::loadGameScene() {
 }
 
 void Game::removeOptions() {
-
+    m_engine.removeSprite(m_options);
 }
 
 void Game::loadOptions() {
-
+    m_engine.addSprite(m_optionsId, 0, 0, 0, 100, 800, 600, m_engine.defaultShader());
 }
 
 void Game::removeGameOver() {
@@ -242,7 +246,7 @@ void Game::loadGameOver() {
 }
 
 void Game::removePauseMenu() {
-    m_engine.removeSprite(m_pausedMenu);
+    m_engine.removeSprite(m_pauseMenu);
 }
 
 void Game::loadPauseMenu() {
@@ -258,17 +262,18 @@ void Game::loadMainMenu() {
 }
 
 void Game::loadSpriteSheets() {
+    // BUG Ids aren't being set properly, probably an issue in the engine api
     m_mainMenuId = m_engine.addSpriteSheet("assets/main-menu.png", 800, 600);
     m_pauseMenuId = m_engine.addSpriteSheet("assets/paused.png", 800, 600);
     m_gameOverId = m_engine.addSpriteSheet("assets/game-over.png", 800, 600);
+    m_optionsId = m_engine.addSpriteSheet("assets/options.png", 800, 600);
 }
 
 void Game::run() {
     // TODO set up crt and scanlines shader
     // TODO set up main menu scene
-    
-    loadSpriteSheets();
 
+    loadSpriteSheets();
     loadMainMenu();
 
     while (m_engine.isRunning()) {

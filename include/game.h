@@ -64,10 +64,13 @@ private:
     float m_snakeSpeed;
     uint32_t m_applesConsumed;
     GameState m_stateBeforeOptions;
+
+    SpriteSheetId m_optionsId;
+    SpriteId m_options;
     SpriteSheetId m_mainMenuId;
     SpriteId m_mainMenu;
     SpriteSheetId m_pauseMenuId;
-    SpriteId m_pausedMenu;
+    SpriteId m_pauseMenu;
     SpriteSheetId m_gameOverId;
     SpriteId m_gameOver;
 };
