@@ -12,6 +12,7 @@ to simplify window management, rendering, shader handling, and input processing.
 ```sh
 # clone the repository
 git clone https://github.com/itljan30/snake.git
+cd snake
 
 # make the build directory
 mkdir build
