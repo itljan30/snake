@@ -4,6 +4,7 @@ Calling it a game engine might be a bit of a stretch, it is intended as an abstr
 to simplify window management, rendering, shader handling, and input processing.
 
 ## Pre-requisites
+- [CMake](https://cmake.org/download/)
 - [Rust](https://www.rust-lang.org/tools/install)
 - On Windows, C++ tools via Microsofts [Visual Studio](https://visualstudio.microsoft.com/vs/features/cplusplus/) installer.
 
