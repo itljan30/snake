@@ -109,6 +109,7 @@ void Game::updatePlaying() {
 void Game::updatePaused() {
     if (m_engine.getKeyState(Key::X) == Action::Pressed) {
         clearScene();
+        removePauseMenu();
         loadMainMenu();
         m_state = GameState::MainMenu;
     }
@@ -234,7 +235,12 @@ void Game::removeOptions() {
 }
 
 void Game::loadOptions() {
-    m_engine.addSprite(m_optionsId, 0, 0, 0, 100, 800, 600, m_engine.defaultShader());
+    m_options = m_engine.addSprite(
+        m_optionsId, 0,
+        0, 0, 10,
+        800, 600,
+        m_engine.defaultShader()
+    );
 }
 
 void Game::removeGameOver() {
@@ -242,7 +248,12 @@ void Game::removeGameOver() {
 }
 
 void Game::loadGameOver() {
-    m_engine.addSprite(m_gameOverId, 0, 0, 0, 1, 800, 600, m_engine.defaultShader());
+    m_gameOver = m_engine.addSprite(
+        m_gameOverId, 0,
+        0, 0, 10,
+        800, 600,
+        m_engine.defaultShader()
+    );
 }
 
 void Game::removePauseMenu() {
@@ -250,7 +261,12 @@ void Game::removePauseMenu() {
 }
 
 void Game::loadPauseMenu() {
-    m_engine.addSprite(m_pauseMenuId, 0, 0, 0, 10, 800, 600, m_engine.defaultShader());
+    m_pauseMenu = m_engine.addSprite(
+        m_pauseMenuId, 0,
+        0, 0, 10,
+        800, 600,
+        m_engine.defaultShader()
+    );
 }
 
 void Game::removeMainMenu() {
@@ -258,20 +274,31 @@ void Game::removeMainMenu() {
 }
 
 void Game::loadMainMenu() {
-    m_engine.addSprite(m_mainMenuId, 0, 0, 0, 1, 800, 600, m_engine.defaultShader());
+    m_mainMenu = m_engine.addSprite(
+        m_mainMenuId, 0,
+        0, 0, 10,
+        800, 600,
+        m_engine.defaultShader()
+    );
 }
 
 void Game::loadSpriteSheets() {
-    // BUG Ids aren't being set properly, probably an issue in the engine api
-    m_mainMenuId = m_engine.addSpriteSheet("assets/main-menu.png", 800, 600);
-    m_pauseMenuId = m_engine.addSpriteSheet("assets/paused.png", 800, 600);
-    m_gameOverId = m_engine.addSpriteSheet("assets/game-over.png", 800, 600);
-    m_optionsId = m_engine.addSpriteSheet("assets/options.png", 800, 600);
+    // This is very fragile since it requires the exe to be in build/
+    // What is the best way to have it search for these files?
+    m_mainMenuId = m_engine.addSpriteSheet("../assets/main-menu.png", 800, 600);
+    m_pauseMenuId = m_engine.addSpriteSheet("../assets/paused.png", 800, 600);
+    m_gameOverId = m_engine.addSpriteSheet("../assets/game-over.png", 800, 600);
+    m_optionsId = m_engine.addSpriteSheet("../assets/options.png", 800, 600);
 }
 
 void Game::run() {
-    // TODO set up crt and scanlines shader
-    // TODO set up main menu scene
+    // I was going to have some cool shaders that made it look more retro with some scanlines and a curved edges,
+    // but converting the shader creation system over to C++ has turned out to be quite difficult. It uses callback
+    // functions in order to get the appropriate attribute and uniform information to send to the GPU, but because of
+    // some conversions that need to be made in order to export C functions that are used by the C++ api, I would need
+    // to dynamically create function pointers that inherently know which function to pass the converted types to. From
+    // what I've found though, I can't really have the engine store thouse dynamically created functions as function 
+    // pointers. I think I'm going to have to completely redesign the system in order to make it possible.
 
     loadSpriteSheets();
     loadMainMenu();
