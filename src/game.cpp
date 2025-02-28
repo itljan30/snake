@@ -184,6 +184,12 @@ void Game::updateGameOver() {
         loadGameScene();
         m_state = GameState::Playing;
     }
+    if (m_engine.getKeyState(Key::X) == Action::Pressed) {
+        removeGameOver();
+        clearScene();
+        loadMainMenu();
+        m_state = GameState::MainMenu;
+    }
 }
 
 void Game::update() {
