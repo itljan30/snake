@@ -19,7 +19,7 @@ include(FetchContent)
 FetchContent_Declare(
     RedGir
     GIT_REPOSITORY https://github.com/itljan30/RedGir.git
-    GIT_TAG        v0.1.0
+    GIT_TAG        cpp-bindings
 )
 
 FetchContent_MakeAvailable(RedGir)
