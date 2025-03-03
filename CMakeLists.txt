@@ -3,8 +3,6 @@ project(snake)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True)
-
 add_executable(
     snake
     src/main.cpp
@@ -20,7 +18,7 @@ include(FetchContent)
 FetchContent_Declare(
     RedGir
     GIT_REPOSITORY https://github.com/itljan30/RedGir.git
-    GIT_TAG        cpp-bindings
+    GIT_TAG        v0.1.0
 )
 
 FetchContent_MakeAvailable(RedGir)
