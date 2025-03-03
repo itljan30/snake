@@ -171,9 +171,9 @@ GameContext Game::generateGameContext() {
     // IDEA I feel like there's probably a way better way to share this information, but I have no idea.
     // Maybe a smart pointer of some kind?
     return GameContext {
-        .snakeParts = m_snakeParts,
-        .engine = m_engine,
-        .apple = m_apple,
+        m_snakeParts,
+        m_engine,
+        m_apple,
     };
 }
 
