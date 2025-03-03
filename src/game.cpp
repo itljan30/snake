@@ -298,7 +298,7 @@ void Game::loadSpriteSheets() {
 }
 
 void Game::run() {
-    // I was going to have some cool shaders that made it look more retro with some scanlines and a curved edges,
+    // I was going to have some cool shaders that made it look more retro with some scanlines and curved edges,
     // but converting the shader creation system over to C++ has turned out to be quite difficult. It uses callback
     // functions in order to get the appropriate attribute and uniform information to send to the GPU, but because of
     // some conversions that need to be made in order to export C functions that are used by the C++ api, I would need

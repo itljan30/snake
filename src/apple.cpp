@@ -5,11 +5,10 @@
 #include <RedGir/sprite.h>
 #include <RedGir/color.h>
 
-#include <cstdlib>
-#include <ctime>
-#include <random>
 #include <algorithm>
 #include <cstdint>
+#include <cstdlib>
+#include <random>
 
 static const Color appleColor = Color(255, 16, 0, 255);
 static const int32_t appleLayer = 3;

@@ -1,3 +1,5 @@
+# TODO Compile all libraries and exe into `${CMAKE_SOURCE_DIR}/bin/`
+
 cmake_minimum_required(VERSION 3.15)
 project(snake)
 set(CMAKE_CXX_STANDARD 17)
