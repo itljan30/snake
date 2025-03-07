@@ -291,10 +291,10 @@ void Game::loadMainMenu() {
 void Game::loadSpriteSheets() {
     // This is very fragile since it requires the exe to be in build/
     // What is the best way to have it search for these files?
-    m_mainMenuId = m_engine.addSpriteSheet("../assets/main-menu.png", 800, 600);
-    m_pauseMenuId = m_engine.addSpriteSheet("../assets/paused.png", 800, 600);
-    m_gameOverId = m_engine.addSpriteSheet("../assets/game-over.png", 800, 600);
-    m_optionsId = m_engine.addSpriteSheet("../assets/options.png", 800, 600);
+    m_mainMenuId = m_engine.addSpriteSheet("./assets/main-menu.png", 800, 600);
+    m_pauseMenuId = m_engine.addSpriteSheet("./assets/paused.png", 800, 600);
+    m_gameOverId = m_engine.addSpriteSheet("./assets/game-over.png", 800, 600);
+    m_optionsId = m_engine.addSpriteSheet("./assets/options.png", 800, 600);
 }
 
 void Game::run() {
