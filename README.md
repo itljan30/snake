@@ -20,4 +20,4 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build .
 ```
-The game should now be in `../snake/build/`, just use `./snake` from inside the build directory.
+The game should now be in the `bin` directory found in the root of the project
